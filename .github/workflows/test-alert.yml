@@ -6,7 +6,7 @@ jobs:
     steps:
       - env:
           TG: ${{ secrets.TELEGRAM_TOKEN }}
-          CHAT: ${{ vars.TELEGRAM_CHAT_ID }}
+          CHAT: ${{ vars.TELEGRAM_CHAT_ID || '1251989579' }}
         run: |
           curl -s "https://api.telegram.org/bot$TG/getMe" | jq -c "{ok, bot: .result.username}"
           curl -s "https://api.telegram.org/bot$TG/getWebhookInfo" | jq -c "{hook: .result.url, pending: .result.pending_update_count}"

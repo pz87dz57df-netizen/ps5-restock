@@ -17,6 +17,12 @@ const SHOPS = [
 const wasInStock = {};
 
 async function notify(title, msg, url) {
+  const tg = process.env.TELEGRAM_TOKEN, chat = process.env.TELEGRAM_CHAT_ID;
+  if (tg && chat) try {
+    await fetch(`https://api.telegram.org/bot${tg}/sendMessage`, { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chat, text: `🚨 ${title}\n${msg}\n${url}` }) });
+  } catch (e) { console.log('telegram failed', e.message); }
   try {
     await fetch(`https://ntfy.sh/${TOPIC}`, { method: 'POST', body: msg,
       headers: { Title: title, Click: url, Priority: 'urgent', Tags: 'video_game' } });

@@ -1,13 +1,24 @@
 name: PS5 Pro restock check
 on:
   schedule:
-    - cron: "*/10 * * * *"   # every 10 minutes
+    - cron: "0 */5 * * *"   # start a new 5.5h checking session every 5 hours (overlaps, so no gap)
   workflow_dispatch:
+    inputs:
+      minutes: { description: 'How long to run (minutes)', default: '330' }
+concurrency:
+  group: restock
+  cancel-in-progress: true   # newest session replaces the old one
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v4
-      - run: python check.py
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install playwright@1.49.1 && npx playwright install --with-deps chromium
+      - run: node check.js
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          INTERVAL: 60
+          RUN_MINUTES: ${{ inputs.minutes || 330 }}

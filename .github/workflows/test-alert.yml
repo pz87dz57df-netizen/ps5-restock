@@ -8,8 +8,11 @@ jobs:
           TG: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT: ${{ vars.TELEGRAM_CHAT_ID }}
         run: |
+          curl -s "https://api.telegram.org/bot$TG/getMe" | jq -c "{ok, bot: .result.username}"
+          curl -s "https://api.telegram.org/bot$TG/getWebhookInfo" | jq -c "{hook: .result.url, pending: .result.pending_update_count}"
+          curl -s "https://api.telegram.org/bot$TG/getUpdates" | jq -c "{n: (.result|length), types: [.result[]|keys[]]}"
           if [ -z "$CHAT" ]; then
-            CHAT=$(curl -s "https://api.telegram.org/bot$TG/getUpdates" | jq -r '[.result[].message.chat.id // empty] | last')
+            CHAT=$(curl -s "https://api.telegram.org/bot$TG/getUpdates" | jq -r '[.result[] | (.message // .my_chat_member // .edited_message).chat.id // empty] | last')
             echo "CHAT_ID=$CHAT"
           fi
           curl -s "https://api.telegram.org/bot$TG/sendMessage" -d chat_id="$CHAT" \

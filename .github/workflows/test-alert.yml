@@ -4,6 +4,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          curl -sf -H "Title: Test alert" -H "Priority: urgent" -H "Tags: video_game" \
-            -d "If you see this pop up, PS5 restock alerts work!" "https://ntfy.sh/${{ secrets.NTFY_TOPIC }}"
+      - env:
+          TG: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT: ${{ vars.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$CHAT" ]; then
+            CHAT=$(curl -s "https://api.telegram.org/bot$TG/getUpdates" | jq -r '[.result[].message.chat.id // empty] | last')
+            echo "CHAT_ID=$CHAT"
+          fi
+          curl -s "https://api.telegram.org/bot$TG/sendMessage" -d chat_id="$CHAT" \
+            -d text="✅ Test alert: PS5 restock alerts work!" | jq -c '{ok, description}'
+          curl -s -H "Title: Test alert" -d "Test alert" "https://ntfy.sh/${{ secrets.NTFY_TOPIC }}" >/dev/null || true

@@ -1,4 +1,4 @@
-// PS5 Pro 1TB (UK) restock checker: checks every INTERVAL seconds for RUN_MINUTES using a real browser.
+// PS5 Pro 2TB (UK) restock checker: checks every INTERVAL seconds for RUN_MINUTES using a real browser.
 const { chromium } = require('playwright');
 
 const TOPIC = process.env.NTFY_TOPIC || 'change-me';
@@ -40,7 +40,7 @@ async function checkAll(ctx) {
       const text = (await page.innerText('body')).toLowerCase();
       const inStock = inRe.test(text) && !outRe.test(text);
       console.log(`${t} ${name}: ${inStock ? 'IN STOCK' : 'out of stock'}`);
-      if (inStock && !wasInStock[name]) await notify('PS5 Pro restock!', `${name} may have PS5 Pro 1TB in stock - tap to open`, url);
+      if (inStock && !wasInStock[name]) await notify('PS5 Pro restock!', `${name} may have PS5 Pro 2TB in stock - tap to open`, url);
       wasInStock[name] = inStock;
     } catch (e) {
       console.log(`${t} ${name}: fetch failed (${e.message.split('\n')[0]})`);

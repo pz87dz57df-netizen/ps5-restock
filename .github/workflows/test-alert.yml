@@ -1,0 +1,9 @@
+name: Send test alert
+on: workflow_dispatch
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -sf -H "Title: Test alert" -H "Priority: urgent" -H "Tags: video_game" \
+            -d "If you see this pop up, PS5 restock alerts work!" "https://ntfy.sh/${{ secrets.NTFY_TOPIC }}"
